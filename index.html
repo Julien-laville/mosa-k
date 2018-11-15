@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<body>
+  <canvas id="canvas-dom"></canvas>
+
+
+  <script>
+
+    const canvasHandler = document.getElementById('canvas-dom')
+    const ctx = canvasHandler.getContext('2d')
+
+    canvasHandler.width = window.innerWidth
+    canvasHandler.height = window.innerHeight
+
+    const CELL_SIZE = Math.floor(window.innerWidth / 100)
+    const GROUP_SIZE = 4000
+
+    const cells = []
+
+
+    const updateCellGroup = () => {
+      let perm = []
+      let a = 0
+      let tmp = 0
+      for(let i = 0; i < 10000; i++) {
+        perm[i] = i
+      }
+      let pos = 0
+      for(let i = 0; i < GROUP_SIZE; i++) {
+        a = Math.floor(Math.random() * (10000 - pos)) + pos
+        tmp = perm[pos]
+        perm[pos] = perm[a]
+        perm[a] = tmp
+        pos++
+      }
+      for(let i = 0; i < GROUP_SIZE; i++) {
+        cells[perm[i]].up()
+      }
+    }
+
+    class Cell {
+      constructor(x, y, h) {
+        this.x = x
+        this.y = y
+        this.h = h
+        this.dec = false
+      }
+
+      up() {
+        if(this.dec) {
+          this.h = this.h-=5
+          if(this.h < 0) {
+            this.dec = false
+          }
+        } else {
+          this.h = this.h+=5
+          if(this.h > 255) {
+            this.dec = true
+          }
+        }
+
+      }
+
+      draw() {
+        ctx.fillStyle = '#fff'
+        ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+        ctx.fillStyle = `hsla(${this.h}, 50%, 50%, 1)`
+        ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+      }
+    }
+    console.log('we take the ram')
+
+    for(let i = 0; i < 100; i++) {
+      for(let j = 0; j < 100; j++) {
+        if(j % 10 === 0) console.log(`>${j}%`)
+        cells.push(new Cell(i, j, Math.floor(Math.random() * 255)))
+      }
+    }
+
+    const d = () => {
+      updateCellGroup()
+      for(let i = 0; i < 10000; i ++) {
+        cells[i].draw()
+      }
+      requestAnimationFrame(d)
+    }
+    d()
+
+  </script>
+</body>
