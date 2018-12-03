@@ -17,31 +17,52 @@
     const cells = []
 
 
-    const updateCellGroup = () => {
-      let perm = []
-      let a = 0
-      let tmp = 0
-      for(let i = 0; i < 10000; i++) {
-        perm[i] = i
+
+
+    class Matrix {
+      constructor(img) {
+        ctx.drawImage(img, 0, 0)
+        this.cells = []
+        let imgData = ctx.getImageData(0,0, 100, 100)
+        for(let i = 0; i < 100 * 100 * 4; i += 4) {
+          this.cells.push(new Cell(i, i % 100, imgData.data[i], imgData.data[i+1], imgData.data[i+2]))
+        }
       }
-      let pos = 0
-      for(let i = 0; i < GROUP_SIZE; i++) {
-        a = Math.floor(Math.random() * (10000 - pos)) + pos
-        tmp = perm[pos]
-        perm[pos] = perm[a]
-        perm[a] = tmp
-        pos++
+
+      draw() {
+        for(let i = 0; i < 100 * 100; i ++) {
+          this.cells[i].draw()
+        }
       }
-      for(let i = 0; i < GROUP_SIZE; i++) {
-        cells[perm[i]].up()
+
+      updateCellGroup()  {
+        let perm = []
+        let a = 0
+        let tmp = 0
+        for(let i = 0; i < 10000; i++) {
+          perm[i] = i
+        }
+        let pos = 0
+        for(let i = 0; i < GROUP_SIZE; i++) {
+          a = Math.floor(Math.random() * (10000 - pos)) + pos
+          tmp = perm[pos]
+          perm[pos] = perm[a]
+          perm[a] = tmp
+          pos++
+        }
+        for(let i = 0; i < GROUP_SIZE; i++) {
+          this.cells[perm[i]].up()
+        }
       }
     }
 
     class Cell {
-      constructor(x, y, h) {
+      constructor(x, y, r, g, b) {
         this.x = x
         this.y = y
-        this.h = h
+        this.r = r
+        this.g = g
+        this.b = b
         this.dec = false
       }
 
@@ -63,27 +84,26 @@
       draw() {
         ctx.fillStyle = '#fff'
         ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-        ctx.fillStyle = `hsla(${this.h}, 50%, 50%, 1)`
+        ctx.fillStyle = `rgba(${this.r}, ${this.g}, ${this.b}, 1)`
         ctx.fillRect(this.x * CELL_SIZE, this.y * CELL_SIZE, CELL_SIZE, CELL_SIZE)
       }
     }
-    console.log('we take the ram')
-
-    for(let i = 0; i < 100; i++) {
-      for(let j = 0; j < 100; j++) {
-        if(j % 10 === 0) console.log(`>${j}%`)
-        cells.push(new Cell(i, j, Math.floor(Math.random() * 255)))
-      }
+    let m = null
+    const loaded = () => {
+      const imgHandler = document.getElementById('imgBlue')
+      m = new Matrix(imgHandler)
+      d()
     }
+
+
 
     const d = () => {
-      updateCellGroup()
-      for(let i = 0; i < 10000; i ++) {
-        cells[i].draw()
-      }
+      m.updateCellGroup()
+      m.draw()
       requestAnimationFrame(d)
     }
-    d()
 
   </script>
+
+<img src="./a.png" id="imgBlue" onload="loaded()">
 </body>

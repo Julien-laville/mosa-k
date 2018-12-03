@@ -1,0 +1,16 @@
+<canvas id="main"></canvas>
+
+<script>
+  main.width = 100
+  main.height = 100
+
+  ;(() => {
+    const offscreen = main.transferControlToOffscreen();
+
+
+    const hw = new Worker('worker.js')
+    hw.postMessage({ canvas: offscreen }, [offscreen]);
+
+  })()
+
+</script>
